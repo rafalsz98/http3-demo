@@ -7,8 +7,8 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"strconv"
-	"strings"
+
+	"github.com/rafalsz98/http3-demo/utils"
 
 	"github.com/quic-go/quic-go/http3"
 )
@@ -17,28 +17,11 @@ type Size interface {
 	Size() int64
 }
 
-func generatePRData(l int) []byte {
-	res := make([]byte, l)
-	seed := uint64(1)
-	for i := 0; i < l; i++ {
-		seed = seed * 48271 % 2147483647
-		res[i] = byte(seed)
-	}
-	return res
-}
-
 func setupHandler(www string) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("%#v\n", r)
-		const maxSize = 1 << 30 // 1 GB
-		num, err := strconv.ParseInt(strings.ReplaceAll(r.RequestURI, "/", ""), 10, 64)
-		if err != nil || num <= 0 || num > maxSize {
-			w.WriteHeader(400)
-			return
-		}
-		w.Write(generatePRData(int(num)))
+		w.Write([]byte("TEST"))
 	})
 
 	mux.HandleFunc("/demo/tile", func(w http.ResponseWriter, r *http.Request) {
@@ -103,22 +86,15 @@ func setupHandler(www string) http.Handler {
 	return mux
 }
 
+var envs utils.Environment
+
 func main() {
-	// TCP
-	err := http3.ListenAndServe("localhost:8000", "/home/rafal/certs/server.crt", "/home/rafal/certs/server.key", setupHandler(""))
+	envs = utils.GetEnvs()
+
+	log.Printf("Starting server on localhost:8000")
+
+	err := http3.ListenAndServe("localhost:8000", envs.SSL.CertPath, envs.SSL.KeyPath, setupHandler(""))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// UDP
-	// quicConfig := &quic.Config{}
-	// server := http3.Server{
-	// 	Handler:    setupHandler(""),
-	// 	Addr:       "localhost:8000",
-	// 	QuicConfig: quicConfig,
-	// }
-	// err := server.ListenAndServeTLS("/home/rafal/certs/server.crt", "/home/rafal/certs/server.key")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 }
