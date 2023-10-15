@@ -1,32 +1,43 @@
-FROM ubuntu:20.04
+FROM debian:12 AS builder
 
-WORKDIR /temp
+WORKDIR /opt
 
-ENV TZ=Europe/Warsaw
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ARG CURL_VERSION=curl-8_4_0
+ARG QUICHE_VERSION=0.18.0
 
-RUN apt-get upgrade
-RUN apt-get update
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential git autoconf libtool cmake golang-go curl libnghttp2-dev zlib1g-dev
 
-RUN apt-get install -yq openssl git gcc g++ wget cmake autoconf
-
-RUN wget -O - https://sh.rustup.rs/ | sh -s -- -y
-ENV PATH="${PATH}:/root/.cargo/bin"
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y -q;
+# ENV PATH="${PATH}:/root/.cargo/bin"
 
 # steps from https://curl.se/docs/http3.html
-RUN git clone -b 0.18.0 --recursive https://github.com/cloudflare/quiche
-WORKDIR /temp/quiche
-RUN cargo build --package quiche --release --features ffi,pkg-config-meta,qlog
-RUN mkdir quiche/deps/boringssl/src/lib
-RUN ln -vnf $(find target/release -name libcrypto.a -o -name libssl.a) quiche/deps/boringssl/src/lib/
+RUN git clone --recursive https://github.com/cloudflare/quiche
 
-WORKDIR /temp
+RUN cd quiche && \
+  export PATH="$HOME/.cargo/bin:$PATH" && \
+  git checkout $QUICHE_VERSION && \
+  cargo build --package quiche --release --features ffi,pkg-config-meta,qlog && \
+  mkdir quiche/deps/boringssl/src/lib && \
+  ln -vnf $(find target/release -name libcrypto.a -o -name libssl.a) quiche/deps/boringssl/src/lib/
+
 RUN git clone https://github.com/curl/curl
-WORKDIR /temp/curl
-RUN apt-get install -yq libtool
-RUN autoreconf -fi
-RUN ./configure LDFLAGS="-Wl,-rpath,/temp/quiche/target/release" --with-openssl=/temp/quiche/quiche/deps/boringssl/src --with-quiche=/temp/quiche/target/release
-RUN make
-RUN make install
+RUN cd curl && \
+  git checkout $CURL_VERSION && \
+  autoreconf -fi && \
+  ./configure LDFLAGS="-Wl,-rpath,/opt/quiche/target/release" --with-openssl=/opt/quiche/quiche/deps/boringssl/src --with-quiche=/opt/quiche/target/release --with-nghttp2 --with-zlib && \
+  make && \
+  make DESTDIR="/debian/" install
 
-CMD [ "/bin/sh" ]
+
+FROM debian:12-slim
+RUN apt-get update && apt-get install -y ca-certificates nghttp2 zlib1g && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /debian/usr/local/ /usr/local/
+COPY --from=builder /opt/quiche/target/release /opt/quiche/target/release
+
+RUN ldconfig
+
+WORKDIR /opt
+
+CMD ["curl"]
