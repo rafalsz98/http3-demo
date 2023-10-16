@@ -91,9 +91,10 @@ var envs utils.Environment
 func main() {
 	envs = utils.GetEnvs()
 
-	log.Printf("Starting server on localhost:8000")
+	address := fmt.Sprintf("0.0.0.0:%s", envs.Port)
+	log.Printf("Starting server on %s", address)
 
-	err := http3.ListenAndServe("localhost:8000", envs.SSL.CertPath, envs.SSL.KeyPath, setupHandler(""))
+	err := http3.ListenAndServe(address, envs.SSL.CertPath, envs.SSL.KeyPath, setupHandler(""))
 	if err != nil {
 		log.Fatal(err)
 	}

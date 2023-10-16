@@ -8,7 +8,8 @@ import (
 )
 
 type Environment struct {
-	SSL struct {
+	Port string `env:"PORT"`
+	SSL  struct {
 		CertPath string `env:"SSL_CERT_PATH"`
 		KeyPath  string `env:"SSL_KEY_PATH"`
 	}
