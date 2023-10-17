@@ -4,7 +4,7 @@ go 1.21.0
 
 require github.com/quic-go/quic-go v0.39.0
 
-require github.com/joho/godotenv v1.5.1 // indirect
+require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/Netflix/go-env v0.0.0-20220526054621-78278af1949d

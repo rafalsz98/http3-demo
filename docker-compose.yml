@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  h3:
+    ports:
+      - "${PORT}:${PORT}"
+    image: "h3:latest"
+    build:
+      context: .
+      dockerfile: h3.Dockerfile
+    network_mode: "host"
