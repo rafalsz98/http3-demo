@@ -9,7 +9,6 @@ RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential git autoconf libtool cmake golang-go curl libnghttp2-dev zlib1g-dev
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y -q;
-# ENV PATH="${PATH}:/root/.cargo/bin"
 
 # steps from https://curl.se/docs/http3.html
 RUN git clone --recursive https://github.com/cloudflare/quiche
