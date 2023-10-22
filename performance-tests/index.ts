@@ -6,6 +6,7 @@ program
   .version("1.0.0", "-v, --version")
   .usage("[OPTIONS]...")
   .argument("<ipAddress>", "IP address to benchmark")
+  .option("-s, --sync", "Synchronous curl calls")
   .option("-h3, --http3", "Use HTTP/3 protocol")
   .option("-n <integer>", "Number of test runs, defaults to 1", "1")
   .option(
@@ -16,10 +17,11 @@ program
 
 program.parse();
 
-const { http3, n, output } = program.opts() as {
+const { http3, n, output, sync } = program.opts() as {
   http3: boolean;
   n: string;
   output: string;
+  sync: boolean;
 };
 const ipAddress = program.args[0];
 
@@ -37,7 +39,9 @@ const writeFields = [
 
 const writeFormat = writeFields.map((field) => `%{${field}}`).join(";");
 
-const results = [] as Promise<string>[];
+const resultsPromise = [] as Promise<string>[];
+const resultsSync = [] as string[];
+
 for (let i = 0; i < Number(n); i++) {
   const { stdout } = spawn([
     "curl",
@@ -47,11 +51,24 @@ for (let i = 0; i < Number(n); i++) {
     ...(http3 ? ["--http3"] : []),
     ipAddress,
   ]);
-  results.push(readableStreamToText(stdout));
+
+  if (sync) {
+    resultsSync.push(await readableStreamToText(stdout));
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write(
+      `--- ${(((i + 1) / Number(n)) * 100).toString()}% ---`
+    );
+  } else {
+    resultsPromise.push(readableStreamToText(stdout));
+  }
 }
+console.log("");
 
 const columns = writeFields.join(";");
-const texts = (await Promise.all(results)).join("\n").replaceAll('"', "");
+const texts = sync
+  ? resultsSync
+  : (await Promise.all(resultsPromise)).join("\n").replaceAll('"', "");
 
 const data = columns + "\n" + texts;
 
