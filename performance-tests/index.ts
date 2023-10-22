@@ -63,12 +63,12 @@ for (let i = 0; i < Number(n); i++) {
     resultsPromise.push(readableStreamToText(stdout));
   }
 }
-console.log("");
+if (sync) console.log("Finished!");
 
 const columns = writeFields.join(";");
-const texts = sync
-  ? resultsSync
-  : (await Promise.all(resultsPromise)).join("\n").replaceAll('"', "");
+const texts = (sync ? resultsSync : await Promise.all(resultsPromise))
+  .join("\n")
+  .replaceAll('"', "");
 
 const data = columns + "\n" + texts;
 
