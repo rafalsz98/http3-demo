@@ -9,9 +9,9 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "start": "bun run index.ts",
-    "docker:build": "docker build . -t perf",
-    "docker:run": "docker run -v ./data:/app/data --rm perf"
+    "inferno": "bun run inferno.ts",
+    "dbuild": "docker build . -t perf",
+    "drun": "docker run -v ./data:/app/data --rm perf"
   },
   "dependencies": {
     "commander": "^11.1.0"

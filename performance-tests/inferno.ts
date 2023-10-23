@@ -4,6 +4,9 @@ import { exit } from "process";
 
 program
   .version("1.0.0", "-v, --version")
+  .description(
+    "Simple performance test that spams GET requests to given address"
+  )
   .usage("[OPTIONS]...")
   .argument("<ipAddress>", "IP address to benchmark")
   .option("-s, --sync", "Synchronous curl calls")

@@ -10,4 +10,4 @@ ENV PATH=$PATH:/root/.bun/bin
 WORKDIR /app
 COPY . .
 
-ENTRYPOINT ["/root/.bun/bin/bun", "start"]
+ENTRYPOINT ["/root/.bun/bin/bun"]
