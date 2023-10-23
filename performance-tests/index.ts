@@ -48,7 +48,7 @@ for (let i = 0; i < Number(n); i++) {
     "-s",
     "-o /dev/null",
     `-w "${writeFormat}"`,
-    ...(http3 ? ["--http3"] : []),
+    ...(http3 ? ["--http3-only"] : []),
     ipAddress,
   ]);
 

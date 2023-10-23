@@ -3,7 +3,7 @@ import pandas as pd
 def process_http_csv(filename, mode, proto):
     df = pd.read_csv(filename, delimiter=";")
 
-    df_http_only = df[df["http_version"] == proto]
+    df_http_only = df[(df["http_version"] == proto) & (df["response_code"] == 200)]
 
     mean_http = df_http_only.mean()
     min_http = df_http_only.min()
