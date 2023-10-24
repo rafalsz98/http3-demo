@@ -1,6 +1,7 @@
 import { readableStreamToText, spawn, write } from "bun";
 import { program } from "commander";
 import { exit } from "process";
+import { METRICS } from "./common";
 
 program
   .version("1.0.0", "-v, --version")
@@ -28,19 +29,7 @@ const { http3, n, output, sync } = program.opts() as {
 };
 const ipAddress = program.args[0];
 
-const writeFields = [
-  "response_code",
-  "http_version",
-  "speed_download",
-  "speed_upload",
-  "time_starttransfer",
-  "time_pretransfer",
-  "time_appconnect",
-  "time_total",
-  "time_connect",
-];
-
-const writeFormat = writeFields.map((field) => `%{${field}}`).join(";");
+const writeFormat = METRICS.map((field) => `%{${field}}`).join(";");
 
 const resultsPromise = [] as Promise<string>[];
 const resultsSync = [] as string[];
@@ -68,7 +57,7 @@ for (let i = 0; i < Number(n); i++) {
 }
 if (sync) console.log("Finished!");
 
-const columns = writeFields.join(";");
+const columns = METRICS.join(";");
 const texts = (sync ? resultsSync : await Promise.all(resultsPromise))
   .join("\n")
   .replaceAll('"', "");
