@@ -1,26 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 21kB of CSS -->
-    <!-- 210kB of JS -->
-    <link rel="stylesheet" href="/public/styleSmall.css" />
-    <link rel="stylesheet" href="/public/styleSmall2.css" />
-    <link rel="stylesheet" href="/public/styleLarge.css" />
-    <link rel="preload" href="/public/script1.js" as="script" />
-    <title>Benchmark Code</title>
-  </head>
-  <body>
-    <div id="box"></div>
-    <button onclick="changeBoxColor()">
-      Change Box Color & Display Timestamp
-    </button>
-    <div class="timestamp" id="timestampText"></div>
-    <script src="/public/script1.js" defer></script>
-    <!-- Filler to make file close to 20kB. Remove if not needed -->
-    <!--
-A few paragraphs of random text to add weight to the file. Normally, you wouldn't want unnecessary comments in your file. However, I'm adding them here to achieve the desired file weight.
+/* 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
@@ -49,11 +27,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl,
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac faucibus nisl, eu lacinia lorem. Fusce vitae laoreet risus. Quisque cursus fringilla metus, in scelerisque ligula ullamcorper ac. Duis tincidunt, velit non accumsan blandit, nibh justo bibendum ex, a cursus massa metus nec tellus. Nulla facilisi. Quisque sed vestibulum nulla, vel mollis elit. Nulla facilisi. Fusce id ornare ante, at maximus justo. Proin eu eros vel dolor aliquet bibendum. Maecenas euismod velit nec ante tempus, sit amet fringilla mi ullamcorper.
--->
-  </body>
-</html>
+*/
