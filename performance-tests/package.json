@@ -10,6 +10,7 @@
   },
   "scripts": {
     "inferno": "bun run inferno.ts",
+    "zeus": "bun run zeus.ts",
     "dbuild": "docker build . -t perf",
     "drun": "docker run -v ./data:/app/data --rm perf"
   },
