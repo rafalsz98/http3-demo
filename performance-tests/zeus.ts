@@ -1,6 +1,7 @@
-import { readableStreamToText, spawn, write } from "bun";
+import { readableStreamToText, spawn } from "bun";
 import { program } from "commander";
 import { exit } from "process";
+
 import { METRICS } from "./common";
 
 program
@@ -50,37 +51,56 @@ const columns = [...METRICS, "iteration", "fileName"].join(";");
 
 const results: string[] = [columns];
 
+const file = output === "-" ? undefined : Bun.file(output);
+const writer = file?.writer();
+
 for (let i = 0; i < Number(n); i++) {
   // download index.html file
   const indexFile = paths[0];
-  const { stdout: indexStdout } = spawn(getCurlSpawn(indexFile));
+  const { stdout: indexStdout, exited: indexExited } = spawn(
+    getCurlSpawn(indexFile)
+  );
+
+  await indexExited;
+
   const indexOutput = (await readableStreamToText(indexStdout))
     .replaceAll('"', "")
     .split(";");
   indexOutput.push(i.toString(), indexFile);
 
+  writer?.write(indexOutput.join(";") + "\n");
   results.push(indexOutput.join(";"));
 
   const promises: Promise<string>[] = [];
+  const exitedPromises: Promise<number>[] = [];
+
   paths.slice(1).forEach((path) => {
-    const { stdout } = spawn(getCurlSpawn(path));
+    const { stdout, exited } = spawn(getCurlSpawn(path));
     promises.push(
       readableStreamToText(stdout).then((value) =>
         `${value};${i};${path}`.replaceAll('"', "")
       )
     );
+    exitedPromises.push(exited);
   });
 
+  await Promise.all(exitedPromises);
   const promisesResults = await Promise.all(promises);
+
+  writer?.write(promisesResults.join("\n") + "\n");
+
   results.push(...promisesResults);
+
+  if (writer) {
+    console.log(`${((i + 1) / Number(n)) * 100}%`);
+  }
 }
 
 const dataToSave = results.join("\n");
 
 if (output === "-") {
   console.log(dataToSave);
-  exit(0);
 }
 
-write(output, dataToSave);
+writer?.flush();
 exit(0);
