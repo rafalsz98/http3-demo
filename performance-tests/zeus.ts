@@ -54,6 +54,8 @@ const results: string[] = [columns];
 const file = output === "-" ? undefined : Bun.file(output);
 const writer = file?.writer();
 
+writer?.write(columns + "\n");
+
 for (let i = 0; i < Number(n); i++) {
   // download index.html file
   const indexFile = paths[0];

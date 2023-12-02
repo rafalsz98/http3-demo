@@ -1,3 +1,4 @@
+response_code;http_version;speed_download;speed_upload;time_starttransfer;time_pretransfer;time_appconnect;time_total;time_connect;iteration;fileName
  200;2;36971;0;0.125957;0.087355;0.087124;0.128073;0.049315;0;/public/
  200;2;2935;0;0.159380;0.088212;0.088134;0.159405;0.042705;0;/public/script1.js
  200;2;29478;0;0.160607;0.100246;0.100174;0.160626;0.051317;0;/public/script2.js
