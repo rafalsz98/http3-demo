@@ -40,7 +40,7 @@ const getCurlSpawn = (fileName: string) => [
   "-s",
   "-o /dev/null",
   `-w "${writeFormat}"`,
-  ...(http3 ? ["--http3-only"] : []),
+  ...(http3 ? ["--http3"] : []),
   `${ipAddress}${fileName}`,
 ];
 
