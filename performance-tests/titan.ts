@@ -18,7 +18,8 @@ program
   .option("-f, --file <path>", "Path of the file to upload");
 
 program.parse();
-const { ipAddress, http3, n, output, file } = program.opts() as {
+const ipAddress = program.args[0];
+const { http3, n, output, file } = program.opts() as {
   ipAddress: string;
   http3: boolean;
   n: string;
@@ -28,13 +29,13 @@ const { ipAddress, http3, n, output, file } = program.opts() as {
 
 const writeFormat = METRICS.map((field) => `%{${field}}`).join(";");
 
-const getCurlSpawn = (iteration: number) => [
+const getCurlSpawn = () => [
   "curl",
-  "-X POST",
   "-s",
+  "-k",
   "-o /dev/null",
   `-w "${writeFormat}"`,
-  "--form",
+  "-F",
   `file=@${file}`,
   ...(http3 ? ["--http3"] : []),
   `${ipAddress}/upload`,
@@ -47,14 +48,14 @@ const fileWriter = output === "-" ? undefined : Bun.file(output).writer();
 fileWriter?.write(columns + "\n");
 
 for (let i = 0; i < Number(n); i++) {
-  const { stdout, exited } = spawn(getCurlSpawn(i));
+  const { stdout, exited } = spawn(getCurlSpawn());
   await exited;
   const output = (await readableStreamToText(stdout)).replaceAll('"', "");
 
   fileWriter?.write(output + "\n");
   results.push(output);
 
-  process.stdout.write(`${((i + 1) / Number(n)) * 100}%`);
+  console.log(`${((i + 1) / Number(n)) * 100}%`);
 }
 
 const dataToSave = results.join("\n");
