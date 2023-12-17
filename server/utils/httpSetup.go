@@ -4,22 +4,33 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
+	"github.com/slok/go-http-metrics/middleware/std"
 )
 
-func SetupHttp() {
+func SetupHttp() http.Handler {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
-	fs := http.FileServer(http.Dir(wd + "/utils/page"))
-	http.Handle("/public/", http.StripPrefix("/public", fs))
+	mdlw := middleware.New(middleware.Config{
+		Recorder: metrics.NewRecorder(metrics.Config{}),
+	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+	fs := http.FileServer(http.Dir(wd + "/utils/page"))
+	mux.Handle("/public/", http.StripPrefix("/public", fs))
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("TEST"))
 	})
 
-	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Write([]byte("405 - Method Not Allowed"))
@@ -63,4 +74,14 @@ func SetupHttp() {
 		fmt.Fprintf(w, "File size: %d bytes", fileSize)
 		w.WriteHeader(http.StatusOK)
 	})
+
+	go func() {
+		fmt.Printf("metrics listening at %s", ":9000")
+		if err := http.ListenAndServe("0.0.0.0:9000", promhttp.Handler()); err != nil {
+			fmt.Printf("error while serving metrics: %s", err)
+		}
+	}()
+
+	h := std.Handler("", mdlw, mux)
+	return h
 }
