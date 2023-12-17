@@ -4,11 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
-	"github.com/slok/go-http-metrics/middleware"
-	"github.com/slok/go-http-metrics/middleware/std"
 )
 
 func SetupHttp() http.Handler {
@@ -17,9 +12,9 @@ func SetupHttp() http.Handler {
 		panic(err)
 	}
 
-	mdlw := middleware.New(middleware.Config{
-		Recorder: metrics.NewRecorder(metrics.Config{}),
-	})
+	// mdlw := middleware.New(middleware.Config{
+	// 	Recorder: metrics.NewRecorder(metrics.Config{}),
+	// })
 
 	mux := http.NewServeMux()
 
@@ -75,13 +70,14 @@ func SetupHttp() http.Handler {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	go func() {
-		fmt.Printf("metrics listening at %s", ":9000")
-		if err := http.ListenAndServe("0.0.0.0:9000", promhttp.Handler()); err != nil {
-			fmt.Printf("error while serving metrics: %s", err)
-		}
-	}()
+	// go func() {
+	// 	fmt.Printf("metrics listening at %s", ":9000")
+	// 	if err := http.ListenAndServe("0.0.0.0:9000", promhttp.Handler()); err != nil {
+	// 		fmt.Printf("error while serving metrics: %s", err)
+	// 	}
+	// }()
 
-	h := std.Handler("", mdlw, mux)
+	// h := std.Handler("", mdlw, mux)
+	h := http.Handler(mux)
 	return h
 }
