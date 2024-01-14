@@ -12,8 +12,11 @@
     "inferno": "bun run inferno.ts",
     "zeus": "bun run zeus.ts",
     "titan": "bun run titan.ts",
-    "dbuild": "docker build . -t perf",
-    "drun": "docker run --cap-add=NET_ADMIN -v ./data:/app/data --rm perf"
+    "dbuild:h2": "docker build . -t perf:h2 -f h2.Dockerfile",
+    "dbuild:h3": "docker build . -t perf:h3 -f h3.Dockerfile",
+    "dbuild:all": "bun run dbuild:h2 && bun run dbuild:h3",
+    "drun:h2": "docker run --cap-add=NET_ADMIN -v ./data:/app/data --rm perf:h2",
+    "drun:h3": "docker run --cap-add=NET_ADMIN -v ./data:/app/data --rm perf:h3"
   },
   "dependencies": {
     "commander": "^11.1.0"
