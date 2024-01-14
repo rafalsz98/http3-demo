@@ -3,6 +3,7 @@ import { program } from "commander";
 import { exit } from "process";
 
 import { METRICS } from "./common";
+import { trafficControl } from "./traffic-control";
 
 program
   .version("1.0.0", "-v, --version")
@@ -15,15 +16,20 @@ program
     "-o, --output <path>",
     "Path to write output to, defaults to - (stdin)",
     "-"
-  );
+  )
+  .option("-t", "Use traffic control");
 
 program.parse();
 const ipAddress = program.args[0];
-const { http3, n, output } = program.opts() as {
+const { http3, n, output, t } = program.opts() as {
   http3: boolean;
   n: string;
   output: string;
+  t: boolean;
 };
+if (t) {
+  trafficControl();
+}
 
 const writeFormat = METRICS.map((field) => `%{${field}}`).join(";");
 const createResourcePaths = (

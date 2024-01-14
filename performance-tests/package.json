@@ -9,13 +9,11 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "traffic-control": "docker run -d --name docker-tc --network host --cap-add NET_ADMIN --restart always -v /var/run/docker.sock:/var/run/docker.sock -v /var/docker-tc:/var/docker-tc lukaszlach/docker-tc",
     "inferno": "bun run inferno.ts",
     "zeus": "bun run zeus.ts",
     "titan": "bun run titan.ts",
     "dbuild": "docker build . -t perf",
-    "drun": "docker run -v ./data:/app/data --rm perf",
-    "drun-tc": "docker run -v ./data:/app/data --net limit-net --label \"com.docker-tc.enabled=1\" --label \"com.docker-tc.loss=50%\" --rm perf"
+    "drun": "docker run --cap-add=NET_ADMIN -v ./data:/app/data --rm perf"
   },
   "dependencies": {
     "commander": "^11.1.0"

@@ -1,7 +1,8 @@
-FROM curl
+FROM curl-ng
 
 RUN apt-get update
 RUN apt-get install -y unzip
+RUN apt-get install -y iproute2
 
 RUN curl -fsSL https://bun.sh/install | bash
 
