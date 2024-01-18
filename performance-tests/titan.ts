@@ -2,6 +2,7 @@ import { readableStreamToText, spawn } from "bun";
 import { program } from "commander";
 import { exit } from "process";
 import { METRICS } from "./common";
+import { trafficControl } from "./traffic-control";
 
 program
   .version("1.0.0", "-v, --version")
@@ -15,17 +16,22 @@ program
     "Path to write output to, defaults to - (stdin)",
     "-"
   )
-  .option("-f, --file <path>", "Path of the file to upload");
+  .option("-f, --file <path>", "Path of the file to upload")
+  .option("-t", "Use traffic control");
 
 program.parse();
 const ipAddress = program.args[0];
-const { http3, n, output, file } = program.opts() as {
+const { http3, n, output, file, t } = program.opts() as {
   ipAddress: string;
   http3: boolean;
   n: string;
   output: string;
   file: string;
+  t: boolean;
 };
+if (t) {
+  trafficControl();
+}
 
 const writeFormat = METRICS.map((field) => `%{${field}}`).join(";");
 
