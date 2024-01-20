@@ -1,8 +1,13 @@
 import { readableStreamToText, spawn, write } from "bun";
 import { program } from "commander";
 import { exit } from "process";
+
 import { METRICS } from "./common";
 import { trafficControl } from "./traffic-control";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execPromise = promisify(exec);
 
 program
   .version("1.0.0", "-v, --version")
@@ -11,7 +16,6 @@ program
   )
   .usage("[OPTIONS]...")
   .argument("<ipAddress>", "IP address to benchmark")
-  .option("-s, --sync", "Synchronous curl calls")
   .option("-h3, --http3", "Use HTTP/3 protocol")
   .option("-n <integer>", "Number of test runs, defaults to 1", "1")
   .option(
@@ -23,11 +27,10 @@ program
 
 program.parse();
 
-const { http3, n, output, sync, t } = program.opts() as {
+const { http3, n, output, t } = program.opts() as {
   http3: boolean;
   n: string;
   output: string;
-  sync: boolean;
   t: boolean;
 };
 const ipAddress = program.args[0];
@@ -38,35 +41,24 @@ if (t) {
 const writeFormat = METRICS.map((field) => `%{${field}}`).join(";");
 
 const resultsPromise = [] as Promise<string>[];
-const resultsSync = [] as string[];
 
 for (let i = 0; i < Number(n); i++) {
-  const { stdout } = spawn([
-    "curl",
-    "-s",
-    "-o /dev/null",
-    `-w "${writeFormat}"`,
-    ...(http3 ? ["--http3-only"] : []),
-    ipAddress,
-  ]);
-
-  if (sync) {
-    resultsSync.push(await readableStreamToText(stdout));
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
-    process.stdout.write(
-      `--- ${(((i + 1) / Number(n)) * 100).toString()}% ---`
-    );
-  } else {
-    resultsPromise.push(readableStreamToText(stdout));
-  }
+  resultsPromise.push(
+    execPromise(
+      [
+        "curl",
+        "-s",
+        "-o /dev/null",
+        `-w "${writeFormat}"`,
+        ...(http3 ? ["--http3-only"] : []),
+        ipAddress,
+      ].join(" ")
+    ).then(({ stdout }) => stdout.replaceAll('"', ""))
+  );
 }
-if (sync) console.log("Finished!");
 
 const columns = METRICS.join(";");
-const texts = (sync ? resultsSync : await Promise.all(resultsPromise))
-  .join("\n")
-  .replaceAll('"', "");
+const texts = (await Promise.all(resultsPromise)).join("\n");
 
 const data = columns + "\n" + texts;
 

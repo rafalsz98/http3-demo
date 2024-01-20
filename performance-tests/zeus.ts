@@ -1,9 +1,12 @@
-import { readableStreamToText, spawn } from "bun";
 import { program } from "commander";
 import { exit } from "process";
+import { exec } from "child_process";
+import { promisify } from "util";
 
 import { METRICS } from "./common";
 import { trafficControl } from "./traffic-control";
+
+const execPromise = promisify(exec);
 
 program
   .version("1.0.0", "-v, --version")
@@ -41,14 +44,15 @@ const createResourcePaths = (
     { length: n },
     (_, i) => `/public/${resourceName}${i + 1}.${resourceExtension}`
   );
-const getCurlSpawn = (fileName: string) => [
-  "curl",
-  "-s",
-  "-o /dev/null",
-  `-w "${writeFormat}"`,
-  ...(http3 ? ["--http3"] : []),
-  `${ipAddress}${fileName}`,
-];
+const getCurlSpawn = (fileName: string) =>
+  [
+    "curl",
+    "-s",
+    "-o /dev/null",
+    `-w "${writeFormat}"`,
+    ...(http3 ? ["--http3"] : []),
+    `${ipAddress}${fileName}`,
+  ].join(" ");
 
 const scriptPaths = createResourcePaths(15, "script", "js");
 const stylesPaths = createResourcePaths(6, "style", "css");
@@ -65,34 +69,24 @@ writer?.write(columns + "\n");
 for (let i = 0; i < Number(n); i++) {
   // download index.html file
   const indexFile = paths[0];
-  const { stdout: indexStdout, exited: indexExited } = spawn(
-    getCurlSpawn(indexFile)
-  );
+  const { stdout: indexStdout } = await execPromise(getCurlSpawn(indexFile));
 
-  await indexExited;
-
-  const indexOutput = (await readableStreamToText(indexStdout))
-    .replaceAll('"', "")
-    .split(";");
+  const indexOutput = indexStdout.replaceAll('"', "").split(";");
   indexOutput.push(i.toString(), indexFile);
 
   writer?.write(indexOutput.join(";") + "\n");
   results.push(indexOutput.join(";"));
 
   const promises: Promise<string>[] = [];
-  const exitedPromises: Promise<number>[] = [];
 
   paths.slice(1).forEach((path) => {
-    const { stdout, exited } = spawn(getCurlSpawn(path));
     promises.push(
-      readableStreamToText(stdout).then((value) =>
-        `${value};${i};${path}`.replaceAll('"', "")
+      execPromise(getCurlSpawn(path)).then(({ stdout }) =>
+        `${stdout};${i};${path}`.replaceAll('"', "")
       )
     );
-    exitedPromises.push(exited);
   });
 
-  await Promise.all(exitedPromises);
   const promisesResults = await Promise.all(promises);
 
   writer?.write(promisesResults.join("\n") + "\n");
