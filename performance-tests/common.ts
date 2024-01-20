@@ -8,4 +8,5 @@ export const METRICS = [
   "time_appconnect",
   "time_total",
   "time_connect",
+  "size_download",
 ];

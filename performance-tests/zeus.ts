@@ -69,7 +69,9 @@ writer?.write(columns + "\n");
 for (let i = 0; i < Number(n); i++) {
   // download index.html file
   const indexFile = paths[0];
-  const { stdout: indexStdout } = await execPromise(getCurlSpawn(indexFile));
+  const { stdout: indexStdout } = await execPromise(
+    getCurlSpawn(indexFile)
+  ).catch(() => ({ stdout: METRICS.map(() => "0").join(";") }));
 
   const indexOutput = indexStdout.replaceAll('"', "").split(";");
   indexOutput.push(i.toString(), indexFile);
@@ -81,9 +83,9 @@ for (let i = 0; i < Number(n); i++) {
 
   paths.slice(1).forEach((path) => {
     promises.push(
-      execPromise(getCurlSpawn(path)).then(({ stdout }) =>
-        `${stdout};${i};${path}`.replaceAll('"', "")
-      )
+      execPromise(getCurlSpawn(path))
+        .then(({ stdout }) => `${stdout};${i};${path}`.replaceAll('"', ""))
+        .catch(() => METRICS.map(() => "0").join(";"))
     );
   });
 

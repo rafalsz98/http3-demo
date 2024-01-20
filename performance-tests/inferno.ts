@@ -50,10 +50,12 @@ for (let i = 0; i < Number(n); i++) {
         "-s",
         "-o /dev/null",
         `-w "${writeFormat}"`,
-        ...(http3 ? ["--http3-only"] : []),
+        ...(http3 ? ["--http3"] : []),
         ipAddress,
       ].join(" ")
-    ).then(({ stdout }) => stdout.replaceAll('"', ""))
+    )
+      .then(({ stdout }) => stdout.replaceAll('"', ""))
+      .catch(() => METRICS.map(() => "0").join(";"))
   );
 }
 
